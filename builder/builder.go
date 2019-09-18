@@ -1,51 +1,55 @@
-package builder
+package main
 
 import "fmt"
 
-// 使用多个简单的对象一步一步构建成一个复杂的对象
+//建造者模式： 使用多个简单的对象一步一步构建成一个复杂的对象
 
-// 外卖点餐
-type TakeAway struct {
-	StapleFood string `json:"staple_food"` // 主食
-	SideDish   string `json:"side_dish"`   // 配菜
-	Chili      string `json:"chili"`       // 辣椒
-	Drink      string `json:"drink"`       // 饮料
-	Remark     string `json:"remark"`      // 备注
+type character struct {
+	Name string
+	Age  int
 }
 
-func (t *TakeAway) YourStapleFood(food string) *TakeAway {
-	t.StapleFood = food
-	return t
+type builder struct {
+	c character
 }
 
-func (t *TakeAway) YourSideDish(food string) *TakeAway {
-	t.SideDish = food
-	return t
-
+func (b *builder) SetName(name string) *builder {
+	b.c.Name = name
+	return b
 }
 
-func (t *TakeAway) WithChili(chili string) *TakeAway {
-	t.Chili = chili
-	return t
+func (b *builder) SetAge(age int) *builder {
+	b.c.Age = age
+	return b
 }
 
-func (t *TakeAway) WithDrink(drink string) *TakeAway {
-	t.Drink = drink
-	return t
-
+type director struct {
+	builder builder
 }
 
-func (t *TakeAway) YourRemark(note string) *TakeAway {
-	t.Remark = note
-	return t
-
+func (d *director) Create(i *info) character {
+	d.builder.SetName(i.name).SetAge(i.age)
+	return d.builder.c
 }
 
-func (t *TakeAway) CreateOrder() {
-	fmt.Printf("你的外卖：%s, %s, %s, %s \n", t.StapleFood, t.SideDish, t.Chili, t.Drink)
-	fmt.Println("备注：" + t.Remark)
+func NewDirector(b builder) *director {
+	return &director{
+		builder: b,
+	}
 }
 
-func NewTakeAwayBuilder() *TakeAway {
-	return &TakeAway{}
+type info struct {
+	name string
+	age  int
+}
+
+func main() {
+
+	builder := builder{}
+
+	director := NewDirector(builder)
+
+	c := director.Create(&info{name: "derek", age: 30})
+
+	fmt.Println(c)
 }

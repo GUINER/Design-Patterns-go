@@ -1,8 +1,13 @@
-package abstract_factory
+package main
 
 import "fmt"
 
 // 抽象工厂，相当于一个工厂的集合。一个工厂可以生产多个产品，如手机、电脑等，因为每个产品都是一个接口，所以一个工厂会可以有多个接口。
+
+const (
+	PorductA = "A"
+	PorductB = "B"
+)
 
 // --------- 产品A接口 ---------
 type ProductMobile interface {
@@ -16,33 +21,53 @@ type ProductComputer interface {
 
 // 实现你的product
 // ----------- mobile -------------
-type MobileA struct {
+type ProductFactoryA struct {
 	BrandName string `json:"brand_name"`
 }
 
-func (m *MobileA) CreateMobile() {
+func (m *ProductFactoryA) CreateMobile() {
 	fmt.Println("generate a mobile : " + m.BrandName)
+}
+func (c *ProductFactoryA) CreateComputer() {
+	fmt.Println("generate a computer : " + c.BrandName)
 }
 
 // ----------- mobile -------------
-type ComputerA struct {
+type ProductFactoryB struct {
 	BrandName string `json:"brand_name"`
 }
 
-func (c *ComputerA) CreateComputer() {
+func (m *ProductFactoryB) CreateMobile() {
+	fmt.Println("generate a mobile : " + m.BrandName)
+}
+
+func (c *ProductFactoryB) CreateComputer() {
 	fmt.Println("generate a computer : " + c.BrandName)
 }
 
 // --------- 抽象工厂 ---------
-type AbstractFactory struct {
-	Mobile   ProductMobile
-	Computer ProductComputer
+type IAbstractFactory interface {
+	CreateMobile()
+	CreateComputer()
 }
 
 // 创建一个工厂
-func NewAbstractFactory(mobile ProductMobile, computer ProductComputer) *AbstractFactory {
-	return &AbstractFactory{
-		Mobile:   mobile,
-		Computer: computer,
+func NewAbstractFactory(product string) IAbstractFactory {
+	switch product {
+	case PorductA:
+		return &ProductFactoryA{BrandName: PorductA}
+	case PorductB:
+		return &ProductFactoryB{BrandName: PorductB}
 	}
+	return nil
+}
+
+func main() {
+	a := NewAbstractFactory(PorductA)
+	a.CreateComputer()
+	a.CreateMobile()
+
+	b := NewAbstractFactory(PorductB)
+	b.CreateComputer()
+	b.CreateMobile()
 }
